@@ -81,22 +81,32 @@ public interface ClientConnectionEvent extends GameEvent {
      * Called after the client authenticates and attempts to login to the
      * server.
      *
-     * <p>Note: This event is fired after #Auth and is NOT async.</p>
+     * <p>Note: This event is fired after #Auth and is NOT async. Any changes 
+     * required for the {@link Player}s {@link Transform} should be done during 
+     * this event and NOT during #Join.
+     * </p>
      */
     interface Login extends ClientConnectionEvent, MessageSinkEvent, Cancellable {
         /**
-         * Gets the {@link RemoteConnection} representing the client connection.
+         * Gets the transform that the {@link Player} came from.
          *
-         * @return The remote connection
+         * @return the previous transform
          */
-        RemoteConnection getConnection();
+        Transform<World> getFromTransform();
 
         /**
-         * Gets the profile of the client attempting to connect.
+         * Gets the new transform that the {@link Player} will change to.
          *
-         * @return The client's profile
+         * @return the new transform
          */
-        GameProfile getProfile();
+        Transform<World> getToTransform();
+
+        /**
+         * Sets the new transform that the {@link Player} will change to.
+         *
+         * @param transform The new transform
+         */
+        void setToTransform(Transform<World> transform);
     }
 
     /**
@@ -113,7 +123,7 @@ public interface ClientConnectionEvent extends GameEvent {
      * Because of this, changes such as modifying {@link VehicleData}
      * should be done at #Post, when the player is fully in the world.</p>
      */
-    interface Join extends ClientConnectionEvent, DisplaceEntityEvent.TargetPlayer, MessageSinkEvent {}
+    interface Join extends ClientConnectionEvent, TargetPlayerEvent, MessageSinkEvent {}
 
     /**
      * Called when a {@link Player} has completely joined a world.
